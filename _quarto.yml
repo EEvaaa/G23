@@ -8,8 +8,8 @@ execute:
 book:
   title: "G23"
   author:
-    - Yiqian Liu (UNI1)
-    - Jiarui Wang (UNI2)
+    - Yiqian Liu (yl5804)
+    - Jiarui Wang (jw4595)
   repo-url: https://github.com/EEvaaa/G23
   date: today
   page-footer:
