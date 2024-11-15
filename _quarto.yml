@@ -8,9 +8,9 @@ execute:
 book:
   title: "YOUR PROJECT TITLE"
   author:
-    - AUTHOR1 (UNI1)
-    - AUTHOR2 (UNI2)
-  repo-url: https://github.com/YOUR_GITHUB_ACCOUNT/REPO_NAME
+    - Yiqian Liu (yl5804)
+    - Jiarui Wang (jw4595)
+  repo-url: https://github.com/EEvaaa/G23
   date: today
   page-footer:
     right: |
