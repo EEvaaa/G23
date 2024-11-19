@@ -4,5 +4,77 @@
 The Crash Reporting - Drivers Data is the primary dataset for this project, maintained by the Maryland State Police through the Automated Crash Reporting System (ACRS). This dataset is collected through traffic accident reports submitted by law enforcement agencies, including the Montgomery County Police, Gaithersburg Police, Takoma Park Police Department, and Rockville Police Department. Provided in CSV format, the dataset contains 188,090 rows and 39 columns, with each row representing a unique traffic collision event. Key columns for analysis include ACRS Report Type, Crash Date/Time, Light, Route Type, Collision Type, Traffic Control, and Speed Limit. This dynamic dataset is updated weekly, reflecting new crash reports joined with related datasets. The scope of the data focuses on traffic collisions within Montgomery County, Maryland, capturing details such as crash types, road types, environmental conditions, and traffic controls. However, some fields, like Traffic Control and Route Type, contain missing values, and preliminary reports may have inconsistencies that could impact analysis. The dataset will be imported using Python’s pandas library, with preprocessing steps including column filtering, handling missing values, and grouping time fields into categories like morning, afternoon, and evening. The dataset is publicly available on the Montgomery County Open Data Portal at this link [https://catalog.data.gov/dataset/crash-reporting-drivers-data].
 
 
-
 ## Missing value analysis
+```{r}
+library(ggplot2)
+library(reshape2)
+```
+
+```{r}
+data <- read.csv("Crash_Reporting.csv")
+selected_data <- data[, c("Report.Number", "ACRS.Report.Type", "Crash.Date.Time", "Route.Type",
+                          "Collision.Type", "Light", "Traffic.Control", "Speed.Limit")]
+write.csv(selected_data, "crash.csv", row.names = FALSE)
+```
+
+```{r}
+car_crash <- read.csv("crash.csv")
+car_crash[car_crash == ""] <- NA
+car_crash[car_crash == "N/A"] <- NA
+
+missing_percentage <- sapply(car_crash, function(x) mean(is.na(x)) * 100)
+missing_summary_df <- data.frame(
+  Column = names(missing_percentage),
+  Missing_Percentage = missing_percentage)
+
+missing_summary_df <- missing_summary_df[order(missing_summary_df$Missing_Percentage, decreasing = TRUE), ]
+
+missing_table <- data.frame(Column = names(car_crash),
+                            Missing_Count = missing_summary_df,
+                            Missing_Percentage = missing_percentage)
+
+print(missing_table)
+```
+
+```{r}
+ggplot(missing_summary_df, aes(x = Missing_Percentage, y = reorder(Column, Missing_Percentage))) +
+  geom_bar(stat = "identity", fill = "skyblue", color = "black") +
+  labs(title = "Missing Data Patterns by Column",
+       x = "Percentage of Missing Data (%)",
+       y = "Columns") +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(size = 10),
+    axis.text.y = element_text(size = 10),
+    plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
+    axis.title.x = element_text(size = 12),
+    axis.title.y = element_text(size = 12)
+  ) +
+  geom_text(aes(label = round(Missing_Percentage, 1)), hjust = -0.2, size = 3.5) +
+  coord_cartesian(xlim = c(0, max(missing_summary_df$Missing_Percentage) + 5))
+```
+
+```{r}
+missing_matrix <- as.data.frame(sapply(car_crash, function(x) as.numeric(is.na(x))))
+missing_corr <- cor(missing_matrix, use = "pairwise.complete.obs")
+missing_corr_melt <- melt(missing_corr)
+
+ggplot(missing_corr_melt, aes(x = Var1, y = Var2, fill = value)) +
+  geom_tile(color = "white") +
+  scale_fill_gradient2(low = "blue", high = "red", mid = "white", midpoint = 0) +
+  labs(title = "Correlation of Missing Data Between Columns",
+       x = "Columns",
+       y = "Columns") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 10, color = "black"),
+        axis.text.y = element_text(size = 10, color = "black"),
+        plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
+        axis.title.x = element_text(size = 12),
+        axis.title.y = element_text(size = 12)) +
+  coord_fixed()
+```
+
+We primarily focused on the following columns: report number, ACRS report type, crash date time, route type, collision type, light, traffic control, and speed limit. Among these, four columns—report number, ACRS report type, crash date time, and speed limit—have no missing data, indicating consistent and complete data collection. In contrast, the remaining four columns—route type, collision type, light, and traffic control—contain varying degrees of missing data.
+To analyze the missing values, we generated a bar chart and a heatmap. The bar chart reveals that traffic control has the highest percentage of missing data at approximately 14.3%. This suggests a potential issue in data collection or entry for this field, highlighting significant incompleteness. The second-highest missing rate is observed in route type (9.8%), which similarly points to possible gaps in data input processes. In comparison, light and collision type exhibit minimal missingness, at 0.8% and 0.3% respectively, reflecting a relatively high level of data completeness for these fields. The heatmap further illustrates the relationships between missing data across columns. A notable correlation exists between missing values in traffic control and route type, suggesting that when one of these columns has missing data, the other is also likely to be incomplete. In contrast, light and collision type show little to no correlation with missing data in other columns, indicating that their missingness is likely independent.
+In conclusion, the dataset has a low overall percentage of missing data, and correlations between missing values across columns are generally weak. This indicates that missing data is neither widespread nor systematically interdependent, simplifying both its analysis and potential imputation strategies.
+
