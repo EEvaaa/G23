@@ -6,7 +6,7 @@ execute:
   echo: true
 
 book:
-  title: "G23"
+  title: "Car Crashing Report"
   author:
     - Yiqian Liu (yl5804)
     - Jiarui Wang (jw4595)
