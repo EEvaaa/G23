@@ -6,10 +6,11 @@ execute:
   echo: true
 
 book:
-  title: "G23"
+  title: "Car Crashing Report"
   author:
     - Yiqian Liu (yl5804)
     - Jiarui Wang (jw4595)
+    - Yufei Duan (yd2793)
   repo-url: https://github.com/EEvaaa/G23
   date: today
   page-footer:
