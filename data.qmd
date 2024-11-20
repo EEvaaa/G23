@@ -29,13 +29,20 @@ missing_summary_df <- data.frame(
   Missing_Count = missing_count,
   Missing_Percentage = missing_percentage)
 
+missing_summary_df <- missing_summary_df[order(missing_summary_df$Missing_Percentage, decreasing = TRUE), ]
+
+missing_table <- data.frame(Column = names(car_crash),
+                            Missing_Count = missing_summary_df,
+                            Missing_Percentage = missing_percentage)
+
+print(missing_table)
 print(missing_summary_df)
 ```
 
 ```{r}
 missing_decrease <- missing_summary_df[order(missing_summary_df$Missing_Percentage, decreasing = TRUE), ]
 ggplot(missing_decrease, aes(x = Missing_Percentage, y = reorder(Column, Missing_Percentage))) +
-  geom_bar(stat = "identity", fill = "skyblue", color = "black") +
+  geom_bar(stat = "identity", fill = "pink", color = "black") +
   labs(title = "Missing Data Patterns by Column",
        x = "Percentage of Missing Data (%)",
        y = "Columns") +
