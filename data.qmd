@@ -58,7 +58,7 @@ missing_corr_melt <- melt(missing_corr)
 
 ggplot(missing_corr_melt, aes(x = Var1, y = Var2, fill = value)) +
   geom_tile(color = "white") +
-  scale_fill_gradient2(low = "blue", high = "red", mid = "green", midpoint = 0) +
+  scale_fill_gradient2(low = "blue", high = "red", mid = "white", midpoint = 0) +
   labs(title = "Correlation of Missing Data Between Columns",
        x = "Columns",
        y = "Columns") +
