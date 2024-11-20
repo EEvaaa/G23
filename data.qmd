@@ -42,7 +42,7 @@ print(missing_summary_df)
 ```{r}
 missing_decrease <- missing_summary_df[order(missing_summary_df$Missing_Percentage, decreasing = TRUE), ]
 ggplot(missing_decrease, aes(x = Missing_Percentage, y = reorder(Column, Missing_Percentage))) +
-  geom_bar(stat = "identity", fill = "pink", color = "black") +
+  geom_bar(stat = "identity", fill = "yellow", color = "black") +
   labs(title = "Missing Data Patterns by Column",
        x = "Percentage of Missing Data (%)",
        y = "Columns") +
