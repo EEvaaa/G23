@@ -29,7 +29,6 @@ missing_summary_df <- data.frame(
   Missing_Count = missing_count,
   Missing_Percentage = missing_percentage)
 
-<<<<<<< HEAD
 missing_summary_df <- missing_summary_df[order(missing_summary_df$Missing_Percentage, decreasing = TRUE), ]
 
 missing_table <- data.frame(Column = names(car_crash),
@@ -37,9 +36,7 @@ missing_table <- data.frame(Column = names(car_crash),
                             Missing_Percentage = missing_percentage)
 
 print(missing_table)
-=======
 print(missing_summary_df)
->>>>>>> 93d73057d86b29d9d0e90104c5cab64ab25310ec
 ```
 
 ```{r}
