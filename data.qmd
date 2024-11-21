@@ -4,7 +4,7 @@
 The Crash Reporting - Drivers Data is the primary dataset for this project, maintained by the Maryland State Police through the Automated Crash Reporting System (ACRS). This dataset is collected through traffic accident reports submitted by law enforcement agencies, including the Montgomery County Police, Gaithersburg Police, Takoma Park Police Department, and Rockville Police Department. Provided in CSV format, the dataset contains 188,090 rows and 39 columns, with each row representing a unique traffic collision event. Key columns for analysis include ACRS Report Type, Crash Date/Time, Light, Route Type, Collision Type, Traffic Control, and Speed Limit. This dynamic dataset is updated weekly, reflecting new crash reports joined with related datasets. The scope of the data focuses on traffic collisions within Montgomery County, Maryland, capturing details such as crash types, road types, environmental conditions, and traffic controls. However, some fields, like Traffic Control and Route Type, contain missing values, and preliminary reports may have inconsistencies that could impact analysis. The dataset will be imported using Python’s pandas library, with preprocessing steps including column filtering, handling missing values, and grouping time fields into categories like morning, afternoon, and evening. The dataset is publicly available on the Montgomery County Open Data Portal at this link [https://catalog.data.gov/dataset/crash-reporting-drivers-data].
 
 
-## Missing value analysis
+## Missing Value Analysis
 ```{r}
 library(ggplot2)
 library(reshape2)
@@ -43,6 +43,7 @@ print(missing_summary_df)
 missing_decrease <- missing_summary_df[order(missing_summary_df$Missing_Percentage, decreasing = TRUE), ]
 ggplot(missing_decrease, aes(x = Missing_Percentage, y = reorder(Column, Missing_Percentage))) +
   geom_bar(stat = "identity", fill = "lightblue", color = "black") +
+  geom_bar(stat = "identity", fill = "pink", color = "black") +
   labs(title = "Missing Data Patterns by Column",
        x = "Percentage of Missing Data (%)",
        y = "Columns") +
