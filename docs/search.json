@@ -34,7 +34,7 @@
     "href": "d3graph.html",
     "title": "4  Interactive graph",
     "section": "",
-    "text": "Instruction: try to play with it.",
+    "text": "Instruction: Users can click the horizontal and vertical buttons to view the corresponding heatmap values and colors. When a button is dark blue, it indicates that it has been clicked. If a button is white, it means it is unclicked.\nP.S.: If the positions of the button groups appear to be misaligned, resizing the window or using Safari may help.",
     "crumbs": [
       "<span class='chapter-number'>4</span>  <span class='chapter-title'>Interactive graph</span>"
     ]
