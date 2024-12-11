@@ -1,10 +1,10 @@
 body {
-    position: relative;
+    position: absolute;
 }
 .button-group-vertical {
     position: absolute;
     top: 117px;
-    left: 450px;
+    left:25%;
 }
 .button-group-vertical button {
     display: flex;             
@@ -22,8 +22,7 @@ body {
     position: absolute;
     display: flex;
     top: 440px;
-    left: 590px;
-    width: 500px;
+    left:39%;
 }
 .button-group-horizontal button {
     display: flex;

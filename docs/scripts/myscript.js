@@ -41,6 +41,7 @@ const svg = d3.select("#grid")
     .attr("width", rectWidth + rectX * 2 + 100)
     .attr("height", rectHeight + rectY + 100); 
 
+
 svg.append("rect")
     .attr("class", "container")
     .attr("x", rectX)
