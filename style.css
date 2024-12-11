@@ -50,3 +50,13 @@ body {
     font-family: Arial, sans-serif;
     font-size: 14px;
 }
+.instruction-box {
+    position: absolute;
+    display: block;
+    top: 540px;
+    left: 39%;
+    width: auto;
+    padding: 10px;
+    font-size: 14px;
+    text-align: center;
+}

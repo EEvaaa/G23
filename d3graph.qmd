@@ -16,4 +16,7 @@
 <div class="button-group-vertical" id="rowButtons"></div>
 <svg id="grid"></svg>
 <div class="button-group-horizontal" id="columnButtons"></div>
+<div class="instruction-box">
+  Instruction: try to play with it.
+</div>
 <script src="scripts/myscript.js"></script>
