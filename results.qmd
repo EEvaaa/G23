@@ -29,24 +29,21 @@ To start, we explore the overall distribution of collision types to understand t
 ```{r}
 # Bar Plot (Frequency of Collision Types)
 
-# Custom color scheme
 colors_for_collisions <- c(
-  "same direction collisions" = "#E41A1C",   # Red
-  "single vehicle collisions" = "#377EB8",   # Blue
-  "head-on collisions" = "#4DAF4A",          # Green
-  "sideswipe collisions" = "#984EA3",        # Purple
-  "unknown" = "#FF7F00",                     # Orange
-  "front/rear collisions" = "#FFFF33",       # Yellow
-  "turning collisions" = "#A65628",          # Brown
-  "opposite direction collisions" = "#F781BF" # Pink
+  "same direction collisions" = "#E41A1C",  
+  "single vehicle collisions" = "#377EB8",   
+  "head-on collisions" = "#4DAF4A",         
+  "sideswipe collisions" = "#984EA3",        
+  "unknown" = "#FF7F00",                     
+  "front/rear collisions" = "#FFFF33",       
+  "turning collisions" = "#A65628",          
+  "opposite direction collisions" = "#F781BF"
 )
 
-# Group and count the Collision.Type values
 collision_counts <- car_crash |> 
   group_by(Collision.Type) |> 
   summarise(Count = n())
 
-# Create the bar graph with the custom color scheme
 ggplot(collision_counts, aes(x = reorder(Collision.Type, -Count), y = Count, fill = Collision.Type)) +
   geom_bar(stat = "identity", show.legend = FALSE) +
   scale_fill_manual(values = colors_for_collisions) +
@@ -58,7 +55,7 @@ ggplot(collision_counts, aes(x = reorder(Collision.Type, -Count), y = Count, fil
   theme_minimal() +
   theme(
     axis.text.x = element_text(angle = 45, hjust = 1),
-    plot.title = element_text(hjust = 0.5, size = 16)
+    plot.title = element_text(size = 16, face = "bold", hjust=0.5)
   )
 
 ```
@@ -71,50 +68,46 @@ Next, we examine the types of routes where these collisions occur most frequentl
 # Bar Plot (Frequency of Route Types)
 crash2_data <- read.csv("crash2.csv")
 crash2_summary <- crash2_data %>%
-  filter(Light %in% c("daylight", "dark lights on", "dark no lights", "dusk", "dawn")) %>% # Select relevant light conditions
-  count(Light, ACRS.Report.Type) # Count occurrences by light and report type
+  filter(Light %in% c("daylight", "dark lights on", "dark no lights", "dusk", "dawn")) %>% 
+  count(Light, ACRS.Report.Type)
 
-
-# Define custom color scheme
 colors_for_route_type <- c(
-  "unknown" = "#FF7F00",                 # Orange
-  "maryland (state)" = "#E377C2",       # Yellow
-  "county" = "#66C2A5",                  # Teal
-  "municipality" = "#8DA0CB",            # Mauve
-  "interstate (state)" = "#2CA02C",      # Dark Green
-  "us (state)" = "#E6550D",              # Burnt Orange
-  "other public roadway" = "#A63603",    # Brick Red
-  "government" = "#08519C",              # Navy Blue
-  "ramp" = "#17BECF",                    # Dark Cyan
-  "service road" = "#8C564B",            # Maroon
-  "municipality route" = "#D62728",      # Magenta
-  "spur" = "#6A51A3",                    # Slate Blue
-  "local route" = "#228B22",             # Forest Green
-  "bicycle route" = "#663399",           # Dark Purple
-  "private route" = "#FFFF33",           # Bright Pink
-  "crossover" = "#BDB76B"                # Dark Yellow
+  "unknown" = "#FF7F00",               
+  "maryland (state)" = "#E377C2", 
+  "county" = "#66C2A5",        
+  "municipality" = "#8DA0CB",    
+  "interstate (state)" = "#2CA02C",     
+  "us (state)" = "#E6550D",              
+  "other public roadway" = "#A63603",    
+  "government" = "#08519C",             
+  "ramp" = "#17BECF",                  
+  "service road" = "#8C564B",           
+  "municipality route" = "#D62728",     
+  "spur" = "#6A51A3",                    
+  "local route" = "#228B22",             
+  "bicycle route" = "#663399",           
+  "private route" = "#FFFF33", 
+  "crossover" = "#BDB76B"           
 )
 
-# Count occurrences of each Route.Type in crash2_data
 route_counts <- crash2_data %>%
   group_by(Route.Type) %>%
   summarise(Count = n()) %>%
   arrange(desc(Count))
 
-# Create the bar graph with custom color scheme
 ggplot(route_counts, aes(x = reorder(Route.Type, -Count), y = Count, fill = Route.Type)) +
-  geom_bar(stat = "identity", show.legend = FALSE, width = 0.7) +  # Narrow bars for better distinction
-  geom_text(aes(label = Count), vjust = -0.5, size = 4, color = "black") +  # Add labels on top of each bar
+  geom_bar(stat = "identity", show.legend = FALSE, width = 0.7) +  
+  geom_text(aes(label = Count), vjust = -0.5, size = 4, color = "black") + 
   labs(
     title = "Count of Route Types",
     x = "Route Type",
     y = "Count"
   ) +
-  scale_y_continuous(expand = c(0, 0), limits = c(0, max(route_counts$Count) * 1.1)) +  # Add space for labels
-  scale_fill_manual(values = colors_for_route_type) +  # Use custom colors
+  scale_y_continuous(expand = c(0, 0), limits = c(0, max(route_counts$Count) * 1.1)) + 
+  scale_fill_manual(values = colors_for_route_type) + 
   theme_minimal() +
   theme(
-    axis.text.x = element_text(angle = 45, hjust = 1, size = 10),  # Rotate x-axis labels
+    axis.text.x = element_text(angle = 45, hjust = 1, size = 10), 
     plot.title = element_text(size = 16, hjust = 0.5, face = "bold"),
     axis.title = element_text(size = 12)
   )
@@ -125,39 +118,34 @@ This bar chart illustrates the distribution of traffic collisions across differe
 To combine these insights, we explore how specific collision types vary across different route types. This visualization reveals patterns unique to certain routes, such as the dominance of 'single vehicle collisions' on rural roads or 'front/rear collisions' on urban streets.
 
 ```{r fig.width=12, fig.height=8, fig.align="center"}
-# Bar Plot (Collision Types faceted by Route Type)
-# Define updated custom color scheme
+
 colors_for_route_type <- c(
-  "unknown" = "#FF7F00",                 # Orange
-  "maryland (state)" = "#E377C2",        # Bright Pink
-  "county" = "#66C2A5",                  # Teal
-  "municipality" = "#8DA0CB",            # Mauve
-  "interstate (state)" = "#2CA02C",      # Dark Green
-  "us (state)" = "#E6550D",              # Burnt Orange
-  "other public roadway" = "#A63603",    # Brick Red
-  "government" = "#08519C",              # Navy Blue
-  "ramp" = "#17BECF",                    # Dark Cyan
-  "service road" = "#8C564B",            # Maroon
-  "municipality route" = "#D62728",      # Magenta
-  "spur" = "#6A51A3",                    # Slate Blue
-  "local route" = "#228B22",             # Forest Green
-  "bicycle route" = "#663399",           # Dark Purple
-  "private route" = "#FFFF33",           # Yellow
-  "crossover" = "#BDB76B"                # Dark Yellow
+  "unknown" = "#FF7F00",                 
+  "maryland (state)" = "#E377C2",       
+  "county" = "#66C2A5",                  
+  "municipality" = "#8DA0CB",           
+  "interstate (state)" = "#2CA02C",     
+  "us (state)" = "#E6550D",              
+  "other public roadway" = "#A63603",   
+  "government" = "#08519C",              
+  "ramp" = "#17BECF",                    
+  "service road" = "#8C564B",            
+  "municipality route" = "#D62728",      
+  "spur" = "#6A51A3",                  
+  "local route" = "#228B22",             
+  "bicycle route" = "#663399",          
+  "private route" = "#FFFF33",          
+  "crossover" = "#BDB76B"             
 )
 
-# Prepare data, sort Route.Type by Collision.Count in descending order within each Collision.Type
 collision_summary <- car_crash |> 
   filter(!is.na(Route.Type), !is.na(Collision.Type)) |> 
   group_by(Route.Type, Collision.Type) |> 
   summarize(Collision.Count = n(), .groups = 'drop') |> 
   arrange(Collision.Type, desc(Collision.Count))
-
-# Reorder Route.Type within each Collision.Type
 collision_summary$Route.Type <- factor(collision_summary$Route.Type, 
                                        levels = unique(collision_summary$Route.Type))
 
-# Create the plot
 ggplot(collision_summary, aes(x = Route.Type, y = Collision.Count, fill = Route.Type)) +
   geom_bar(stat = "identity", position = "dodge") +
   labs(
@@ -171,7 +159,7 @@ ggplot(collision_summary, aes(x = Route.Type, y = Collision.Count, fill = Route.
   theme(
     axis.text.x = element_text(angle = 45, hjust = 1),
     legend.position = "bottom",
-    plot.title = element_text(hjust = 0.5, size = 14, face = "bold")
+    plot.title = element_text(hjust = 0.5, size = 16, face = "bold")
   ) +
   facet_wrap(~ Collision.Type, scales = "free_y", ncol = 4)
 
@@ -188,8 +176,6 @@ Traffic control systems play a crucial role in managing safety on the road. Here
 # Bar Plot (Frequency of Traffic Control Types)
 
 car_crash <- read.csv("crash2.csv")
-
-# Count occurrences of each Traffic.Control
 traffic_control_counts <- car_crash |>
   group_by(Traffic.Control) |>
   summarise(Count = n()) |>
@@ -212,7 +198,6 @@ colors_for_traffic_control <- c(
   "bicycle crossing sign" = "#969696"
 )
 
-# Create the bar graph
 ggplot(traffic_control_counts, aes(x = reorder(Traffic.Control, -Count), y = Count, fill = Traffic.Control)) +
   geom_bar(stat = "identity", show.legend = FALSE) +
   scale_fill_manual(values = colors_for_traffic_control) + 
@@ -223,8 +208,8 @@ ggplot(traffic_control_counts, aes(x = reorder(Traffic.Control, -Count), y = Cou
   ) +
   theme_minimal() +
   theme(
-    axis.text.x = element_text(angle = 45, hjust = 1, size = 10),  # Rotate x-axis labels
-    plot.title = element_text(size = 16, hjust = 0.5),
+    axis.text.x = element_text(angle = 45, hjust = 1, size = 10),  
+    plot.title = element_text(size = 16, face = "bold", hjust=0.5),
     axis.title = element_text(size = 12)
   ) 
 
@@ -256,7 +241,8 @@ ggplot(car_crash_counts, aes(x = reorder(ACRS.Report.Type, -Count), y = Count, f
     y = "Count"
   ) +
   theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        plot.title = element_text(size = 16, face = "bold", hjust=0.5))
 
 ```
 
@@ -268,39 +254,35 @@ To evaluate the effectiveness of traffic controls, we explore their relationship
 
 ```{r}
 # Mosaic Plot (Crash Type & Traffic Control)
-# Define the custom color scheme for Traffic Control
 colors_for_traffic_control <- c(
   "no controls" = "#A6CEE3",   
   "traffic signal" = "#FB9A99",   
   "stop sign" = "#B3DE69"
 )
 
-# Add a new column for selected traffic controls
 car_crash$Traffic.Control.selected <- ifelse(
   car_crash$Traffic.Control %in% names(colors_for_traffic_control),
   car_crash$Traffic.Control,
-  NA  # Set to NA if it doesn't match the selected categories
+  NA 
 )
 
-# Remove rows where Traffic.Control.selected is NA
 car_crash <- car_crash[!is.na(car_crash$Traffic.Control.selected), ]
-
-# Generate a mosaic plot with Traffic Control on y-axis and Report Type on x-axis
 mosaic(
-  ~ Traffic.Control.selected + ACRS.Report.Type,  # Formula for mosaic plot
+  ~ Traffic.Control.selected + ACRS.Report.Type, 
   data = car_crash,
-  direction = "v",  # Vertical direction for Traffic Control as y-axis
+  direction = "v", 
   gp = gpar(
     fill = colors_for_traffic_control[levels(as.factor(car_crash$Traffic.Control.selected))]
   ),
   main = "Mosaic Plot: Traffic Control vs Crash Type",
+  main_gp = gpar(fontsize = 16, fontface = "bold"), 
   xlab = "Crash Type",
   ylab = "Traffic Control",
-  labeling = labeling_values,  # Add frequencies to each part of the plot
+  labeling = labeling_values, 
   labeling_args = list(
-    rot_labels = c(bottom = 45),  # Rotate x-axis labels to slant
-    gp_labels = list(bottom = gpar(fontsize = 8, fontface = "italic")),  # Customize font for x-axis labels
-    gp_text = gpar(fontsize = 10, col = "black")  # Customize frequency label font size and color
+    rot_labels = c(bottom = 45), 
+    gp_labels = list(bottom = gpar(fontsize = 8, fontface = "italic")), 
+    gp_text = gpar(fontsize = 10, col = "black")
   )
 )
 
@@ -308,18 +290,15 @@ mosaic(
 
 The mosaic plot shows how different types of traffic controls, such as "no controls," "stop signs," and "traffic signals", relate to the severity of crashes. Notably, property damage crashes dominate across all traffic control types. Crashes at intersections with "no controls" are the most frequent overall, especially for injury and property damage incidents, emphasizing the risks of unregulated roadways. On the other hand, crashes at "traffic signals" are less likely to result in fatalities but still significant for property damage. The low number of crashes at "stop signs" suggests their relative effectiveness in regulating traffic, though their small sample size may warrant further study. This analysis highlights the critical role of traffic control measures in reducing severe crash outcomes.
 
-
-
 To delve deeper, we use an alluvial plot to trace the flow from traffic controls to collision types and crash outcomes. This comprehensive view uncovers trends, such as the role of 'no controls' in severe crashes.
 
 
-```{r}
+```{r fig.width=12, fig.height=6, fig.align="center"}
 # Alluvial (Traffic Control & Collision Type & Crash Type)
 
 filtered_data <- crash2_data[, c("Traffic.Control", "Collision.Type", "ACRS.Report.Type")]
 filtered_data <- na.omit(filtered_data)
 
-# Convert columns to factors
 filtered_data$Traffic.Control <- factor(filtered_data$Traffic.Control)
 filtered_data$Collision.Type <- factor(filtered_data$Collision.Type)
 filtered_data$ACRS.Report.Type <- factor(filtered_data$ACRS.Report.Type)
@@ -329,7 +308,6 @@ filtered_data <- filtered_data %>%
     Collision.Type %in% c("same direction collisions", "sideswipe collisions", "single vehicle collisions", "head-on collisions")
   )
 
-# Define the custom color scheme for Traffic Control
 colors_for_traffic_control <- c(
   "no controls" = "#A6CEE3",   
   "traffic signal" = "#FB9A99",   
@@ -347,25 +325,23 @@ colors_for_traffic_control <- c(
   "bicycle crossing sign" = "#969696"
 )
 
-# Summarize the data
 alluvium_data <- filtered_data %>%
   group_by(Traffic.Control, Collision.Type, ACRS.Report.Type) %>%
   summarize(Freq = n(), .groups = 'drop')
 
-# Create the alluvium plot with the custom Traffic Control color scheme
 ggplot(alluvium_data, aes(axis1 = Traffic.Control, axis2 = Collision.Type, axis3 = ACRS.Report.Type, y = Freq)) +
-  geom_alluvium(aes(fill = Traffic.Control)) +  # Fill based on Traffic.Control
+  geom_alluvium(aes(fill = Traffic.Control)) + 
   geom_stratum() +
   geom_text(stat = "stratum", aes(label = after_stat(stratum))) +
   scale_x_discrete(limits = c("Traffic.Control", "Collision.Type", "ACRS.Report.Type"), expand = c(0.1, 0.1)) +
-  scale_fill_manual(values = colors_for_traffic_control) +  # Apply custom colors
+  scale_fill_manual(values = colors_for_traffic_control) + 
   labs(
     title = "Relationship between Traffic Control, Collision Type, and Report Type",
     x = "Categories",
     y = "Frequency",
-    fill = "Traffic Control"
-  ) +
-  theme_minimal()
+    fill = "Traffic Control") + 
+  theme_minimal() +
+  theme(plot.title = element_text(size = 16, face = "bold", hjust=0.5)) 
 ```
 This alluvial diagram highlights the relationship between traffic control types, collision types, and crash severities. Areas with "no controls" account for the majority of single vehicle and sideswipe collisions, leading predominantly to property damage crashes and a smaller proportion of injury crashes. This pattern underscores the risks posed by unregulated roadways, especially for drivers prone to lane changes or loss of control. In contrast, "traffic signals" are primarily linked to same direction collisions, contributing significantly to property damage and injury crashes, indicating possible driver errors or violations at intersections. "Stop signs" are less frequent and associated mainly with sideswipe and same direction collisions. To mitigate these risks, implementing traffic controls, such as rumble strips or advanced warning systems, in high-risk areas could help prevent single vehicle incidents, while improving signal visibility and timing may reduce same direction collisions.
 
@@ -383,8 +359,8 @@ ggplot(crash2_data, aes(x = Collision.Type, y = Speed.Limit)) +
   ) +
   theme_minimal() +
   theme(
-    axis.text.x = element_text(angle = 45, hjust = 1) # Rotate x-axis labels for readability
-  )
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    plot.title = element_text(size = 16, face = "bold", hjust=0.5))
 ```
 The boxplot suggests that while speed limits across collision types share some similarities, there are notable differences in the median and variability, particularly for opposite direction collisions and unknown collisions. Opposite direction collisions show a lower median speed limit, suggesting they often occur on roads with relatively lower speed limits. Other groups shows a similar median, showing that other types of collisions are most likely to occur on roads with speed limit between 30-40. 
 
@@ -401,7 +377,6 @@ top_report_types <- car_crash |>
 filtered_data <- car_crash |>
   filter(ACRS.Report.Type %in% top_report_types)
 
-# Ridge plot with custom colors
 ggplot(filtered_data, aes(x = Speed.Limit, y = fct_reorder(ACRS.Report.Type, Speed.Limit), fill = ACRS.Report.Type)) +
   geom_density_ridges(alpha = 0.7, scale = 1.5) +
   scale_fill_manual(values = c("#CC7A8B", "#7FBF7F", "#89CFF0")) + # Custom pastel colors
@@ -415,8 +390,7 @@ ggplot(filtered_data, aes(x = Speed.Limit, y = fct_reorder(ACRS.Report.Type, Spe
   theme(
     legend.position = "top",
     axis.text.y = element_text(size = 10, angle = 0),
-    plot.title = element_text(size = 14, hjust = 0.5)
-  )
+    plot.title = element_text(size = 16, hjust = 0.5, face="bold"))
 
 ```
 This ridge plot shows how speed limits are distributed across different crash severity levels: fatal crashes, injury crashes, and property damage crashes.
@@ -424,10 +398,147 @@ Fatal crashes tend to occur at higher speed limits, with a notable peak around 4
 Higher speeds are strongly associated with more severe crashes (injuries and fatalities), while lower-speed environments tend to result in property damage-only incidents. This analysis highlights the importance of speed regulation and traffic control measures in reducing crash severity and preventing fatalities.
 The ridgeline plot effectively compares the probability distributions of different crash types across speed limits although showing some multi-modality. It highlights the speed ranges with higher likelihoods for specific crash types.
 
-
-
 Environmental factors, such as lighting, also play a role in crash severity. This stacked bar chart shows the distribution of crash types under different light conditions, emphasizing the higher frequency of incidents in daylight and 'dark-lighted' scenarios.
 
+
+```{r}
+# Stacked Bar Chart (Light Condition & Crash Type)
+crash2_summary <- crash2_data %>%
+  filter(!is.na(Light), !is.na(ACRS.Report.Type)) %>% 
+  group_by(Light, ACRS.Report.Type) %>%
+  summarize(Count = n(), .groups = "drop")  
+
+crash2_summary <- crash2_summary %>%
+  group_by(Light) %>%
+  mutate(Total = sum(Count)) %>%
+  ungroup() %>%
+  mutate(Light = reorder(Light, -Total)) 
+
+colors_for_crash_type <- c(
+  "fatal crash" = "#CC7A8B",          
+  "injury crash" = "#7FBF7F",        
+  "property damage crash" = "#89CFF0" 
+)
+
+ggplot(crash2_summary, aes(x = Light, y = Count, fill = ACRS.Report.Type)) +
+  geom_bar(stat = "identity") +
+  scale_fill_manual(values = colors_for_crash_type) +  # Apply custom colors
+  labs(
+    title = "Number of Crash Types by Light Condition",
+    x = "Light Condition",
+    y = "Number of Crashes",
+    fill = "Crash Type"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1), 
+    plot.title = element_text(size = 14, face = "bold", hjust = 0.5)
+  )
+
+```
+The majority of traffic accidents happen in daylight conditions, which could be attributed to higher traffic volumes during these times, and dark with lights on is the second highest frequently occurring accident conditions. 
+Property damage crashes are the majority crash type under all categories and injury crash is the second highest, suggesting that most crashes are minor accidents instead of severe collisions. Regardless of light conditions, fatal crashes are a small proportion of total crashes, suggesting that most accidents are not life-threatening. 
+
+To quantify these relationships, we use a heatmap to visualize the correlation between crash types and specific light conditions. This provides a clearer picture of how lighting impacts safety.
+
+```{r fig.width=12, fig.height=6, fig.align="center"}
+# Correlation Heatmap (Crash Types and Light Conditions)
+clean_data <- na.omit(car_crash[, c("ACRS.Report.Type", "Light")])
+clean_data$Light <- trimws(clean_data$Light)
+clean_data$Light[clean_data$Light == ""] <- "unknown"
+
+freq_table <- table(clean_data$ACRS.Report.Type, clean_data$Light)
+freq_data <- as.data.frame(freq_table)
+colnames(freq_data) <- c("ACRS.Report.Type", "Light", "Frequency")
+
+ggplot(freq_data, aes(x = Light, y = ACRS.Report.Type, fill = Frequency)) +
+  geom_tile(color = "white") +
+  geom_text(aes(label = Frequency), color = "black", size = 3) + 
+  scale_fill_gradient(low = "lightblue", high = "darkblue") +
+  labs(
+    title = "Correlation Heatmap: ACRS Report Type and Light Conditions",
+    x = "Light Condition",
+    y = "ACRS Report Type",
+    fill = "Frequency"
+  ) +
+  theme_minimal(base_size = 15) +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    plot.title = element_text(hjust = 0.5, face = "bold")
+  )
+```
+
+The heatmap visualizes the distribution of crash report types across different light conditions. Daylight accounts for the majority of crashes, especially property damage crashes (~80,386) and injury crashes (~46,945). In dark-lighted conditions, property damage crashes (~27,812) and injury crashes (~14,983) are also frequent, but much lower than in daylight. Crashes significantly decrease under dark-not-lighted, dusk, and dawn conditions. Fatal crashes are rare across all light conditions, with the highest (~200) occurring during daylight. The data highlights how visibility and lighting impact crash frequencies, with daylight showing the highest crash occurrences likely due to increased traffic volume.
+
+
+## Temporal Patterns
+
+Time of day significantly influences accident frequency. This line plot reveals temporal patterns, such as peak accident times during rush hours, providing crucial insights for planning interventions.
+
+```{r}
+# Line Plot (Time)
+library(lubridate)
+crash2_data <- crash2_data %>%
+  mutate(
+    Crash.DateTime = as.POSIXct(Crash.Date.Time, format = "%m/%d/%Y %I:%M:%S %p"),
+    Hour = hour(Crash.DateTime)
+  )
+
+accident_by_hour <- crash2_data %>%
+  group_by(Hour) %>%
+  summarise(Accident_Count = n(), .groups = "drop")
+
+ggplot(accident_by_hour, aes(x = Hour, y = Accident_Count)) +
+  geom_smooth(se = FALSE, color = "red", size = 1, method = "loess", span = 0.3) + 
+  labs(
+    title = "Line Plot of Accidents by Hour of Day",
+    x = "Hour of Day",
+    y = "Number of Accidents"
+  ) +
+  theme_minimal() + 
+  theme(plot.title = element_text(size = 16, face = "bold", hjust=0.5))
+```
+
+1. The number of accidents are relatively low during early morning and late nights, and this is likely due to lower traffic volume during these hours when most people are asleep.
+2. A noticeable increase in accidents begins around 6 AM, peaking around 8–9 AM.This corresponds to the morning rush hour when traffic volume is high as people commute to work or school.
+3. After the morning peak, the frequency of accidents decreases during the late morning and early afternoon hours. This is likely due to reduced traffic volume during non-peak hours.
+4. A second, more significant peak occurs in the late afternoon, with the highest number of accidents observed around 4–5 PM. This is due to the evening rush hour as people commute home.
+5. After 7 pm, the number of accidents decreases because the traffic volume decreases. While traffic may still exist during this time, it is significantly reduced compared to rush hours.
+
+The plot mirrors traffic volume throughout the day, with fewer accidents during early morning hours (midnight to 5 AM) due to minimal activity. Peaks in accidents during the morning (6–9 AM) and evening (3–6 PM) align with rush hours when road usage is highest, while the midday dip (10 AM to 2 PM) reflects lighter traffic. This trend highlights how accident frequency closely follows daily traffic patterns.
+
+Finally, combining time with collision types and crash outcomes in a stacked bar chart offers a comprehensive view of how collision dynamics evolve throughout the day.
+
+```{r fig.width=12, fig.height=6, fig.align="center"}
+# Stacked Bar Chart (Collision Types & Crash Types & Time)
+collision_data <- car_crash |>
+  filter(!is.na(Collision.Type), !is.na(ACRS.Report.Type)) |>
+  mutate(Hour = hour(hms(format(strptime(Crash.Date.Time, "%m/%d/%Y %I:%M:%S %p"), "%H:%M:%S")))) |>
+  group_by(Hour, Collision.Type, ACRS.Report.Type) |>
+  summarise(Count = n(), .groups = "drop") |>
+  group_by(Hour, ACRS.Report.Type) |>
+  mutate(Proportion = Count / sum(Count))
+
+ggplot(collision_data, aes(x = factor(Hour), y = Proportion, fill = Collision.Type)) +
+  geom_bar(stat = "identity", position = "fill") +
+  facet_wrap(~ ACRS.Report.Type, ncol = 3, scales = "free_x") +
+  scale_y_continuous(labels = scales::percent) +
+  labs(
+    title = "Percentage of Collision Types by Hour and Report Type",
+    x = "Hour of Day",
+    y = "Percentage",
+    fill = "Collision Type") +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1, size = 10),
+    legend.position = "bottom",
+    plot.title = element_text(size = 16, face = "bold", hjust=0.5))
+
+
+```
+This faceted stacked bar chart highlights distinct patterns in collision types based on the time of day and crash severity. During daylight hours, same direction collisions and sideswipe collisions are the most common, likely due to higher traffic density, frequent lane changes, and the increased likelihood of vehicles traveling approximately. However, during nighttime hours, single vehicle collisions become significantly more prevalent. This shift can be attributed to reduced visibility, impaired driver alertness, and environmental factors such as poorly lit roads or obstacles that are harder to detect in the dark.
+One particularly notable finding is the severity associated with head-on collisions, which are far more likely to result in fatal crashes compared to injury or property damage crashes. This shows head-on collisions’ potential to cause severe injuries or fatalities, even at relatively lower traffic volumes. In contrast, same direction collisions, while frequent, rarely result in fatal outcomes. This suggests that these collisions are typically less severe, possibly involving lower speeds or more controlled conditions.
+These patterns highlight the need for specific safety improvements to reduce collisions. For example, nighttime single vehicle crashes could be minimized with better street lighting, rumble strips to keep drowsy drivers alert, and public awareness campaigns about the dangers of impaired driving. On the other hand, preventing head-on collisions may require clearer road markings, better signage, and installing median barriers to separate traffic, especially on high-speed rural roads. These observations provide a clear direction for using data to inform strategies that improve road safety and address the risks linked to different types of crashes at various times.
 
 
 
