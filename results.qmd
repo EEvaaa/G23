@@ -187,7 +187,7 @@ Traffic control systems play a crucial role in managing safety on the road. Here
 ```{r}
 # Bar Plot (Frequency of Traffic Control Types)
 
-car_crash <- read.csv("/Users/helenwang/Desktop/5702 final proj/crash2.csv")
+car_crash <- read.csv("crash2.csv")
 
 # Count occurrences of each Traffic.Control
 traffic_control_counts <- car_crash |>
@@ -266,6 +266,167 @@ This bar plot visualizes the distribution of crash types in the dataset, categor
 To evaluate the effectiveness of traffic controls, we explore their relationship with crash severity. This mosaic plot highlights how the presence of stop signs or traffic signals correlates with fewer severe crashes.
 
 
+```{r}
+# Mosaic Plot (Crash Type & Traffic Control)
+# Define the custom color scheme for Traffic Control
+colors_for_traffic_control <- c(
+  "no controls" = "#A6CEE3",   
+  "traffic signal" = "#FB9A99",   
+  "stop sign" = "#B3DE69"
+)
+
+# Add a new column for selected traffic controls
+car_crash$Traffic.Control.selected <- ifelse(
+  car_crash$Traffic.Control %in% names(colors_for_traffic_control),
+  car_crash$Traffic.Control,
+  NA  # Set to NA if it doesn't match the selected categories
+)
+
+# Remove rows where Traffic.Control.selected is NA
+car_crash <- car_crash[!is.na(car_crash$Traffic.Control.selected), ]
+
+# Generate a mosaic plot with Traffic Control on y-axis and Report Type on x-axis
+mosaic(
+  ~ Traffic.Control.selected + ACRS.Report.Type,  # Formula for mosaic plot
+  data = car_crash,
+  direction = "v",  # Vertical direction for Traffic Control as y-axis
+  gp = gpar(
+    fill = colors_for_traffic_control[levels(as.factor(car_crash$Traffic.Control.selected))]
+  ),
+  main = "Mosaic Plot: Traffic Control vs Crash Type",
+  xlab = "Crash Type",
+  ylab = "Traffic Control",
+  labeling = labeling_values,  # Add frequencies to each part of the plot
+  labeling_args = list(
+    rot_labels = c(bottom = 45),  # Rotate x-axis labels to slant
+    gp_labels = list(bottom = gpar(fontsize = 8, fontface = "italic")),  # Customize font for x-axis labels
+    gp_text = gpar(fontsize = 10, col = "black")  # Customize frequency label font size and color
+  )
+)
+
+```
+
+The mosaic plot shows how different types of traffic controls, such as "no controls," "stop signs," and "traffic signals", relate to the severity of crashes. Notably, property damage crashes dominate across all traffic control types. Crashes at intersections with "no controls" are the most frequent overall, especially for injury and property damage incidents, emphasizing the risks of unregulated roadways. On the other hand, crashes at "traffic signals" are less likely to result in fatalities but still significant for property damage. The low number of crashes at "stop signs" suggests their relative effectiveness in regulating traffic, though their small sample size may warrant further study. This analysis highlights the critical role of traffic control measures in reducing severe crash outcomes.
+
+
+
+To delve deeper, we use an alluvial plot to trace the flow from traffic controls to collision types and crash outcomes. This comprehensive view uncovers trends, such as the role of 'no controls' in severe crashes.
+
+
+```{r}
+# Alluvial (Traffic Control & Collision Type & Crash Type)
+
+filtered_data <- crash2_data[, c("Traffic.Control", "Collision.Type", "ACRS.Report.Type")]
+filtered_data <- na.omit(filtered_data)
+
+# Convert columns to factors
+filtered_data$Traffic.Control <- factor(filtered_data$Traffic.Control)
+filtered_data$Collision.Type <- factor(filtered_data$Collision.Type)
+filtered_data$ACRS.Report.Type <- factor(filtered_data$ACRS.Report.Type)
+filtered_data <- filtered_data %>%
+  filter(
+    Traffic.Control %in% c("no controls", "traffic signal", "stop sign"),
+    Collision.Type %in% c("same direction collisions", "sideswipe collisions", "single vehicle collisions", "head-on collisions")
+  )
+
+# Define the custom color scheme for Traffic Control
+colors_for_traffic_control <- c(
+  "no controls" = "#A6CEE3",   
+  "traffic signal" = "#FB9A99",   
+  "unknown" = "#807DBA",                  
+  "stop sign" = "#B3DE69",                
+  "flashing traffic signal" = "#BCBD22",
+  "yield sign" = "#9E9AC8",              
+  "person" = "#FDAE6B",        
+  "warning sign" = "#31A354",      
+  "other signal" = "#9C9EDE",    
+  "pedestrian crossing" = "#F768A1",   
+  "railroad crossing device" = "#F7FB6B",
+  "other pavement marking" = "#7FCDBB", 
+  "school zone sign" = "#B2DF9A", 
+  "bicycle crossing sign" = "#969696"
+)
+
+# Summarize the data
+alluvium_data <- filtered_data %>%
+  group_by(Traffic.Control, Collision.Type, ACRS.Report.Type) %>%
+  summarize(Freq = n(), .groups = 'drop')
+
+# Create the alluvium plot with the custom Traffic Control color scheme
+ggplot(alluvium_data, aes(axis1 = Traffic.Control, axis2 = Collision.Type, axis3 = ACRS.Report.Type, y = Freq)) +
+  geom_alluvium(aes(fill = Traffic.Control)) +  # Fill based on Traffic.Control
+  geom_stratum() +
+  geom_text(stat = "stratum", aes(label = after_stat(stratum))) +
+  scale_x_discrete(limits = c("Traffic.Control", "Collision.Type", "ACRS.Report.Type"), expand = c(0.1, 0.1)) +
+  scale_fill_manual(values = colors_for_traffic_control) +  # Apply custom colors
+  labs(
+    title = "Relationship between Traffic Control, Collision Type, and Report Type",
+    x = "Categories",
+    y = "Frequency",
+    fill = "Traffic Control"
+  ) +
+  theme_minimal()
+```
+This alluvial diagram highlights the relationship between traffic control types, collision types, and crash severities. Areas with "no controls" account for the majority of single vehicle and sideswipe collisions, leading predominantly to property damage crashes and a smaller proportion of injury crashes. This pattern underscores the risks posed by unregulated roadways, especially for drivers prone to lane changes or loss of control. In contrast, "traffic signals" are primarily linked to same direction collisions, contributing significantly to property damage and injury crashes, indicating possible driver errors or violations at intersections. "Stop signs" are less frequent and associated mainly with sideswipe and same direction collisions. To mitigate these risks, implementing traffic controls, such as rumble strips or advanced warning systems, in high-risk areas could help prevent single vehicle incidents, while improving signal visibility and timing may reduce same direction collisions.
+
+
+## Influence of Speed and Light Conditions
+
+Speed limits are another critical factor influencing collision outcomes. This box plot illustrates the range of speed limits associated with different collision types, revealing that higher speeds are often linked to severe incidents.
+```{r}
+ggplot(crash2_data, aes(x = Collision.Type, y = Speed.Limit)) +
+  geom_boxplot(outlier.color = "red", fill = "lightblue") +
+  labs(
+    title = "Variation of Speed Limits Across Collision Types",
+    x = "Collision Type",
+    y = "Speed Limit"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1) # Rotate x-axis labels for readability
+  )
+```
+The boxplot suggests that while speed limits across collision types share some similarities, there are notable differences in the median and variability, particularly for opposite direction collisions and unknown collisions. Opposite direction collisions show a lower median speed limit, suggesting they often occur on roads with relatively lower speed limits. Other groups shows a similar median, showing that other types of collisions are most likely to occur on roads with speed limit between 30-40. 
+
+
+Building on the previous analysis, this histogram focuses on crash types and their speed limit distributions. It highlights whether lower speed limits effectively reduce the severity of crashes.
+```{r}
+# Ridgeline Plot (Speed Limit Faceted by Crash Types)
+
+top_report_types <- car_crash |>
+  count(ACRS.Report.Type) |>
+  top_n(3, wt = n) |>
+  pull(ACRS.Report.Type)
+
+filtered_data <- car_crash |>
+  filter(ACRS.Report.Type %in% top_report_types)
+
+# Ridge plot with custom colors
+ggplot(filtered_data, aes(x = Speed.Limit, y = fct_reorder(ACRS.Report.Type, Speed.Limit), fill = ACRS.Report.Type)) +
+  geom_density_ridges(alpha = 0.7, scale = 1.5) +
+  scale_fill_manual(values = c("#CC7A8B", "#7FBF7F", "#89CFF0")) + # Custom pastel colors
+  labs(
+    title = "Speed Limit Distribution by ACRS Report Types",
+    x = "Speed Limit (mph)",
+    y = "ACRS Report Type",
+    fill = "ACRS Report Type"
+  ) +
+  theme_minimal() +
+  theme(
+    legend.position = "top",
+    axis.text.y = element_text(size = 10, angle = 0),
+    plot.title = element_text(size = 14, hjust = 0.5)
+  )
+
+```
+This ridge plot shows how speed limits are distributed across different crash severity levels: fatal crashes, injury crashes, and property damage crashes.
+Fatal crashes tend to occur at higher speed limits, with a notable peak around 40 mph. Injury crashes show a broader distribution of speed limits, with a peak at approximately 35 mph. Property damage-only crashes are concentrated at moderate speed limits, particularly around 30-35 mph. These types of crashes are less severe and are often associated with lower-speed urban environments or rear-end collisions.
+Higher speeds are strongly associated with more severe crashes (injuries and fatalities), while lower-speed environments tend to result in property damage-only incidents. This analysis highlights the importance of speed regulation and traffic control measures in reducing crash severity and preventing fatalities.
+The ridgeline plot effectively compares the probability distributions of different crash types across speed limits although showing some multi-modality. It highlights the speed ranges with higher likelihoods for specific crash types.
+
+
+
+Environmental factors, such as lighting, also play a role in crash severity. This stacked bar chart shows the distribution of crash types under different light conditions, emphasizing the higher frequency of incidents in daylight and 'dark-lighted' scenarios.
 
 
 
